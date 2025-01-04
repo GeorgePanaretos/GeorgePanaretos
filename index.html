@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    :root {
+      --neon-green: #9fef00;
+      --dark-bg: #111927;
+      --darker-bg: #0a1016;
+      --card-bg: #1a2332;
+      --text-color: #a4b1cd;
+    }
+    
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-color);
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .profile-header {
+      background-color: var(--darker-bg);
+      border: 1px solid var(--neon-green);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(159, 239, 0, 0.1);
+    }
+
+    .matrix-bg {
+      background: 
+        linear-gradient(rgba(10, 16, 22, 0.9), rgba(10, 16, 22, 0.9)),
+        repeating-linear-gradient(0deg, 
+          transparent 0%, 
+          rgba(159, 239, 0, 0.1) 50%, 
+          transparent 100%);
+      background-size: cover, 100px 100px;
+      animation: matrix 20s linear infinite;
+    }
+
+    @keyframes matrix {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 0 0, 0 100%; }
+    }
+
+    .neon-text {
+      color: var(--neon-green);
+      text-shadow: 0 0 5px rgba(159, 239, 0, 0.5);
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--neon-green);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(159, 239, 0, 0.1);
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: var(--darker-bg);
+      border: 1px solid var(--neon-green);
+      color: var(--neon-green);
+      padding: 5px 10px;
+      margin: 4px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .badge:hover {
+      background-color: var(--neon-green);
+      color: var(--darker-bg);
+      box-shadow: 0 0 10px var(--neon-green);
+      transition: all 0.3s ease;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: var(--darker-bg);
+      border-radius: 4px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--neon-green);
+      box-shadow: 0 0 10px var(--neon-green);
+      animation: glow 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 5px var(--neon-green);
+      }
+      to {
+        box-shadow: 0 0 15px var(--neon-green);
+      }
+    }
+
+    h1, h2, h3 {
+      color: var(--neon-green);
+      text-transform: uppercase;
+    }
+
+    .terminal-text::before {
+      content: "$ ";
+      color: var(--neon-green);
+    }
+  </style>
+</head>
+<body class="matrix-bg">
+  <div class="container">
+    <div class="profile-header">
+      <h1 class="neon-text">GEORGIOS_PANARETOS</h1>
+      <p class="terminal-text">Location: Bratislava, Slovakia</p>
+      <p class="terminal-text">Contact: </p>
+      <div class="progress-bar">
+        <div class="progress" style="width: 85%"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>SYSTEM_PROFILE</h2>
+      <p class="terminal-text">Senior Software Engineer specializing in banking system exploitation and core infrastructure penetration. Expert in financial technology integration and system architecture manipulation.</p>
+    </div>
+
+    <div class="card">
+      <h2>SKILL_MATRIX</h2>
+      <div>
+        <span class="badge">Java</span>
+        <span class="badge">Spring Framework</span>
+        <span class="badge">Git</span>
+        <span class="badge">Appway</span>
+        <span class="badge">SQL</span>
+        <span class="badge">XML</span>
+        <span class="badge">YAML</span>
+        <span class="badge">OpenAPI</span>
+        <span class="badge">JSON</span>
+        <span class="badge">Avaloq</span>
+        <span class="badge">UML</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>MISSION_HISTORY</h2>
+      <h3>// Synpulse Slovakia s.r.o.</h3>
+      <p class="terminal-text">Successfully enhanced Temenos WUI for Bethmann Bank Frankfurt</p>
+      <p class="terminal-text">Reverse engineered XML structures for Paybox Bank AG</p>
+      <p class="terminal-text">Led covert migration operation for Belgian banking infrastructure</p>
+      
+     
+      <h3>// Casino Neckar Gmbh</h3>
+      <p class="terminal-text">Executed strategic software improvement operations</p>
+    </div>
+
+    <div class="card">
+      <h2>CORE_COMPETENCIES</h2>
+      <div>
+        <span class="badge">System Integration</span>
+        <span class="badge">Technical Analysis</span>
+        <span class="badge">Requirements Gathering</span>
+        <span class="badge">Problem Solving</span>
+        <span class="badge">Team Leadership</span>
+        <span class="badge">Project Management</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>SPECIAL_OPS</h2>
+      <p class="terminal-text">Hellenic Special Forces - IT Operations Manager</p>
+      <p class="terminal-text">Managed classified information transmission systems</p>
+    </div>
+  </div>
+</body>
+</html>
