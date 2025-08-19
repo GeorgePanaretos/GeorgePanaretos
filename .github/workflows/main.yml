@@ -1,33 +1,105 @@
 name: Generate pacman animation
 
 on:
-  schedule: # execute every 12 hours
-    - cron: "* */3 * * *"
+  schedule:
+    # 00:00 UTC on day 1,4,7,... of each month (~ every 72h)
+    - cron: "0 0 */3 * *"
+  workflow_dispatch: {}
 
-  workflow_dispatch:
-
-  push:
-    branches:
-    - main
+# Prevent overlapping runs
+concurrency:
+  group: pacman-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  generate:
-    permissions:
-      contents: write
+  check-activity:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
+    # Read-only is enough for checks
+    permissions:
+      contents: read
+
+    outputs:
+      active: ${{ steps.recent.outputs.active }}
 
     steps:
-      - name: generate pacman-contribution-graph.svg
+      - name: Small random jitter (0–120s)
+        run: sleep $((RANDOM % 121))
+
+      - name: Check recent public activity (last 7 days)
+        id: recent
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = context.repo.owner;
+            const since = new Date(Date.now() - 7*24*60*60*1000);
+            const { data: events } = await github.request(
+              'GET /users/{username}/events/public',
+              { username, per_page: 100 }
+            );
+            const recent = events.filter(e => new Date(e.created_at) >= since);
+            core.info(`Public events in last 7 days: ${recent.length}`);
+            core.setOutput('active', recent.length > 0 ? 'true' : 'false');
+
+  generate-and-publish:
+    needs: check-activity
+    if: needs.check-activity.outputs.active == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Only this job needs write to push the site
+    permissions:
+      contents: write
+
+    env:
+      GH_USERNAME: ${{ github.repository_owner }}
+
+    steps:
+      - name: Checkout main (for action context)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Generate pacman-contribution-graph.svg
         uses: abozanona/pacman-contribution-graph@main
         with:
-          github_user_name: ${{ github.repository_owner }}
+          github_user_name: ${{ env.GH_USERNAME }}
 
+      # Fetch current file from the output branch to compare
+      - name: Checkout output branch to tmp
+        run: |
+          git init tmp && cd tmp
+          git remote add origin "https://github.com/${{ github.repository }}.git"
+          git fetch --depth=1 origin output || true
+          git checkout -qf FETCH_HEAD || echo "No output branch yet"
+        shell: bash
 
-      - name: push pacman-contribution-graph.svg to the output branch
+      - name: Decide if artifact changed
+        id: diff
+        run: |
+          NEW="dist/pacman-contribution-graph.svg"
+          OLD="tmp/pacman-contribution-graph.svg"
+          if [ ! -f "$OLD" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if cmp -s "$NEW" "$OLD"; then
+            echo "No change in SVG."
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "SVG changed."
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to output branch
+        if: steps.diff.outputs.changed == 'true'
         uses: crazy-max/ghaction-github-pages@v3.1.0
         with:
           target_branch: output
           build_dir: dist
+          # keep_history default is true; action only commits when there are changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Skip publish (no changes)
+        if: steps.diff.outputs.changed != 'true'
+        run: echo "Skipping publish: generated SVG is identical to existing one."
